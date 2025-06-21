@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../../node_modules/wrangler/config-schema.json",
+  "name": "livestore_websocketserver",
+  "main": "./src/index.ts",
+  "compatibility_date": "2025-06-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "WEBSOCKET_SERVER",
+        "class_name": "WebSocketServer",
+      },
+    ],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "livestore",
+      "database_id": "some-random-id",
+    },
+  ],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["WebSocketServer"],
+    },
+  ],
+}

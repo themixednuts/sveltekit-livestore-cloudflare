@@ -1,0 +1,162 @@
+diff --git a/dist/cf-worker/worker.d.ts b/dist/cf-worker/worker.d.ts
+index ad181b16ab972a11b955dbdda26bf2416059e526..7e25cf3a0e290a7a921761244d703afd3d031957 100644
+--- a/dist/cf-worker/worker.d.ts
++++ b/dist/cf-worker/worker.d.ts
+@@ -1,9 +1,13 @@
+ import type { Schema } from '@livestore/utils/effect';
+ import type { Env } from './durable-object.js';
+-export type CFWorker = {
+-    fetch: (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>;
++import type { ExecutionContext, Request, Rpc, DurableObjectNamespace, HeadersInit, Response as CFResponse } from '@cloudflare/workers-types';
++type ExtractDurableObjectKeys<TEnv = Env> = TEnv extends Env ? [keyof TEnv] extends [keyof Env] ? string : keyof {
++    [K in keyof TEnv as K extends keyof Env ? never : TEnv[K] extends DurableObjectNamespace<any> ? K : never]: TEnv[K];
++} : never;
++export type CFWorker<TEnv extends Env = Env, T extends Rpc.DurableObjectBranded | undefined = undefined> = {
++    fetch: <CFHostMetada = unknown>(request: Request<CFHostMetada>, env: TEnv, ctx: ExecutionContext) => Promise<CFResponse>;
+ };
+-export type MakeWorkerOptions = {
++export type MakeWorkerOptions<TEnv extends Env = Env> = {
+     validatePayload?: (payload: Schema.JsonValue | undefined) => void | Promise<void>;
+     /** @default false */
+     enableCORS?: boolean;
+@@ -13,10 +17,10 @@ export type MakeWorkerOptions = {
+          *
+          * @default 'WEBSOCKET_SERVER'
+          */
+-        name?: string;
++        name?: ExtractDurableObjectKeys<TEnv>;
+     };
+ };
+-export declare const makeWorker: (options?: MakeWorkerOptions) => CFWorker;
++export declare const makeWorker: <TEnv extends Env = Env, TDurableObjectRpc extends Rpc.DurableObjectBranded | undefined = undefined>(options?: MakeWorkerOptions<TEnv>) => CFWorker<TEnv, TDurableObjectRpc>;
+ /**
+  * Handles `/websocket` endpoint.
+  *
+@@ -41,9 +45,10 @@ export declare const makeWorker: (options?: MakeWorkerOptions) => CFWorker;
+  *
+  * @throws {UnexpectedError} If the payload is invalid
+  */
+-export declare const handleWebSocket: (request: Request, env: Env, _ctx: ExecutionContext, options: {
++export declare const handleWebSocket: <TEnv extends Env = Env, TDurableObjectRpc extends Rpc.DurableObjectBranded | undefined = undefined, CFHostMetada = unknown>(request: Request<CFHostMetada>, env: TEnv, _ctx: ExecutionContext, options: {
+     headers?: HeadersInit;
+-    durableObject?: MakeWorkerOptions["durableObject"];
++    durableObject?: MakeWorkerOptions<TEnv>["durableObject"];
+     validatePayload?: (payload: Schema.JsonValue | undefined) => void | Promise<void>;
+-}) => Promise<Response>;
++}) => Promise<CFResponse>;
++export {};
+ //# sourceMappingURL=worker.d.ts.map
+diff --git a/dist/cf-worker/worker.d.ts.map b/dist/cf-worker/worker.d.ts.map
+index 2ab317d6b1a695a2fe8ecc99ee370e2f2f544354..4e2f1913dab86c4144af0c59852f0ba213ea58b4 100644
+--- a/dist/cf-worker/worker.d.ts.map
++++ b/dist/cf-worker/worker.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"worker.d.ts","sourceRoot":"","sources":["../../src/cf-worker/worker.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,yBAAyB,CAAA;AAIrD,OAAO,KAAK,EAAE,GAAG,EAAE,MAAM,qBAAqB,CAAA;AAE9C,MAAM,MAAM,QAAQ,GAAG;IACrB,KAAK,EAAE,CAAC,OAAO,EAAE,OAAO,EAAE,GAAG,EAAE,GAAG,EAAE,GAAG,EAAE,gBAAgB,KAAK,OAAO,CAAC,QAAQ,CAAC,CAAA;CAChF,CAAA;AAED,MAAM,MAAM,iBAAiB,GAAG;IAC9B,eAAe,CAAC,EAAE,CAAC,OAAO,EAAE,MAAM,CAAC,SAAS,GAAG,SAAS,KAAK,IAAI,GAAG,OAAO,CAAC,IAAI,CAAC,CAAA;IACjF,qBAAqB;IACrB,UAAU,CAAC,EAAE,OAAO,CAAA;IACpB,aAAa,CAAC,EAAE;QACd;;;;WAIG;QACH,IAAI,CAAC,EAAE,MAAM,CAAA;KACd,CAAA;CACF,CAAA;AAED,eAAO,MAAM,UAAU,GAAI,UAAS,iBAAsB,KAAG,QAiD5D,CAAA;AAED;;;;;;;;;;;;;;;;;;;;;;;GAuBG;AACH,eAAO,MAAM,eAAe,GAC1B,SAAS,OAAO,EAChB,KAAK,GAAG,EACR,MAAM,gBAAgB,EACtB,SAAS;IACP,OAAO,CAAC,EAAE,WAAW,CAAA;IACrB,aAAa,CAAC,EAAE,iBAAiB,CAAC,eAAe,CAAC,CAAA;IAClD,eAAe,CAAC,EAAE,CAAC,OAAO,EAAE,MAAM,CAAC,SAAS,GAAG,SAAS,KAAK,IAAI,GAAG,OAAO,CAAC,IAAI,CAAC,CAAA;CAClF,KACA,OAAO,CAAC,QAAQ,CAwCmC,CAAA"}
+\ No newline at end of file
++{"version":3,"file":"worker.d.ts","sourceRoot":"","sources":["../../src/cf-worker/worker.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,yBAAyB,CAAA;AAIrD,OAAO,KAAK,EAAE,GAAG,EAAE,MAAM,qBAAqB,CAAA;AAC9C,OAAO,KAAK,EACV,gBAAgB,EAChB,OAAO,EACP,GAAG,EACH,sBAAsB,EACtB,WAAW,EACX,QAAQ,IAAI,UAAU,EACvB,MAAM,2BAA2B,CAAA;AAElC,KAAK,wBAAwB,CAAC,IAAI,GAAG,GAAG,IAAI,IAAI,SAAS,GAAG,GACxD,CAAC,MAAM,IAAI,CAAC,SAAS,CAAC,MAAM,GAAG,CAAC,GAC9B,MAAM,GACN,MAAM;KACH,CAAC,IAAI,MAAM,IAAI,IAAI,CAAC,SAAS,MAAM,GAAG,GACnC,KAAK,GACL,IAAI,CAAC,CAAC,CAAC,SAAS,sBAAsB,CAAC,GAAG,CAAC,GACzC,CAAC,GACD,KAAK,GAAG,IAAI,CAAC,CAAC,CAAC;CACtB,GACH,KAAK,CAAA;AAET,MAAM,MAAM,QAAQ,CAAC,IAAI,SAAS,GAAG,GAAG,GAAG,EAAE,CAAC,SAAS,GAAG,CAAC,oBAAoB,GAAG,SAAS,GAAG,SAAS,IAAI;IACzG,KAAK,EAAE,CAAC,YAAY,GAAG,OAAO,EAC5B,OAAO,EAAE,OAAO,CAAC,YAAY,CAAC,EAC9B,GAAG,EAAE,IAAI,EACT,GAAG,EAAE,gBAAgB,KAClB,OAAO,CAAC,UAAU,CAAC,CAAA;CACzB,CAAA;AAED,MAAM,MAAM,iBAAiB,CAAC,IAAI,SAAS,GAAG,GAAG,GAAG,IAAI;IACtD,eAAe,CAAC,EAAE,CAAC,OAAO,EAAE,MAAM,CAAC,SAAS,GAAG,SAAS,KAAK,IAAI,GAAG,OAAO,CAAC,IAAI,CAAC,CAAA;IACjF,qBAAqB;IACrB,UAAU,CAAC,EAAE,OAAO,CAAA;IACpB,aAAa,CAAC,EAAE;QACd;;;;WAIG;QACH,IAAI,CAAC,EAAE,wBAAwB,CAAC,IAAI,CAAC,CAAA;KACtC,CAAA;CACF,CAAA;AAED,eAAO,MAAM,UAAU,GACrB,IAAI,SAAS,GAAG,GAAG,GAAG,EACtB,iBAAiB,SAAS,GAAG,CAAC,oBAAoB,GAAG,SAAS,GAAG,SAAS,EAE1E,UAAS,iBAAiB,CAAC,IAAI,CAAM,KACpC,QAAQ,CAAC,IAAI,EAAE,iBAAiB,CAiDlC,CAAA;AAED;;;;;;;;;;;;;;;;;;;;;;;GAuBG;AACH,eAAO,MAAM,eAAe,GAC1B,IAAI,SAAS,GAAG,GAAG,GAAG,EACtB,iBAAiB,SAAS,GAAG,CAAC,oBAAoB,GAAG,SAAS,GAAG,SAAS,EAC1E,YAAY,GAAG,OAAO,EAEtB,SAAS,OAAO,CAAC,YAAY,CAAC,EAC9B,KAAK,IAAI,EACT,MAAM,gBAAgB,EACtB,SAAS;IACP,OAAO,CAAC,EAAE,WAAW,CAAA;IACrB,aAAa,CAAC,EAAE,iBAAiB,CAAC,IAAI,CAAC,CAAC,eAAe,CAAC,CAAA;IACxD,eAAe,CAAC,EAAE,CAAC,OAAO,EAAE,MAAM,CAAC,SAAS,GAAG,SAAS,KAAK,IAAI,GAAG,OAAO,CAAC,IAAI,CAAC,CAAA;CAClF,KACA,OAAO,CAAC,UAAU,CA6DmE,CAAA"}
+diff --git a/dist/cf-worker/worker.js b/dist/cf-worker/worker.js
+index 1786fcc06da90a6bcafa619b44e19e2833bae800..8a33fecbbfeadc57a66687b482697d20569b7faf 100644
+--- a/dist/cf-worker/worker.js
++++ b/dist/cf-worker/worker.js
+@@ -87,13 +87,31 @@ export const handleWebSocket = (request, env, _ctx, options) => Effect.gen(funct
+         }
+     }
+     const durableObjectName = options.durableObject?.name ?? 'WEBSOCKET_SERVER';
++    if (!(durableObjectName in env)) {
++        return new Response(`Failed dependency: Required Durable Object binding '${durableObjectName}' not available`, {
++            status: 424,
++            headers: options.headers,
++        });
++    }
+     const durableObjectNamespace = env[durableObjectName];
+     const id = durableObjectNamespace.idFromName(storeId);
+     const durableObject = durableObjectNamespace.get(id);
+     const upgradeHeader = request.headers.get('Upgrade');
+     if (!upgradeHeader || upgradeHeader !== 'websocket') {
+-        return new Response('Durable Object expected Upgrade: websocket', { status: 426, headers: options?.headers });
++        return new Response('Durable Object expected Upgrade: websocket', {
++            status: 426,
++            headers: options?.headers,
++        });
+     }
+-    return yield* Effect.promise(() => durableObject.fetch(request));
++    return yield* Effect.promise(() => durableObject.fetch(request.url, {
++        method: request.method,
++        body: request.body,
++        cf: request.cf,
++        fetcher: request.fetcher,
++        headers: request.headers,
++        integrity: request.integrity,
++        redirect: request.redirect,
++        signal: request.signal,
++    }));
+ }).pipe(Effect.tapCauseLogPretty, Effect.runPromise);
+ //# sourceMappingURL=worker.js.map
+diff --git a/dist/cf-worker/worker.js.map b/dist/cf-worker/worker.js.map
+index 2a7bf817041afcc2ca151a91321499933ffee26a..46e1f14e5e463fe3fcf6c3f9920c743c91d03ba2 100644
+--- a/dist/cf-worker/worker.js.map
++++ b/dist/cf-worker/worker.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"worker.js","sourceRoot":"","sources":["../../src/cf-worker/worker.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"worker.js","sourceRoot":"","sources":["../../src/cf-worker/worker.ts"],"names":[],"mappings":"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"}
+diff --git a/package.json b/package.json
+index 28789bfedb597f962371a7b473aec7a1eb507065..8996303728d315c8e6fa49e51f6e13b03100bd48 100644
+--- a/package.json
++++ b/package.json
+@@ -1,8 +1,9 @@
+ {
+   "name": "@livestore/sync-cf",
+   "version": "0.3.1",
+-  "type": "module",
++  "license": "Apache-2.0",
+   "sideEffects": false,
++  "type": "module",
+   "exports": {
+     ".": {
+       "types": "./dist/sync-impl/mod.d.ts",
+@@ -11,26 +12,33 @@
+     "./cf-worker": {
+       "types": "./dist/cf-worker/mod.d.ts",
+       "default": "./dist/cf-worker/mod.js"
++    },
++    "./cf-worker/durable-object": {
++      "types": "./dist/cf-worker/durable-object.d.ts",
++      "default": "./dist/cf-worker/durable-object.js"
++    },
++    "./cf-worker/worker": {
++      "types": "./dist/cf-worker/worker.d.ts",
++      "default": "./dist/cf-worker/worker.js"
+     }
+   },
+-  "dependencies": {
+-    "@livestore/common": "0.3.1",
+-    "@livestore/utils": "0.3.1"
+-  },
+-  "devDependencies": {
+-    "@cloudflare/workers-types": "^4.20250303.0"
+-  },
+   "files": [
+     "dist",
+     "src",
+     "package.json",
+     "README.md"
+   ],
+-  "license": "Apache-2.0",
+-  "publishConfig": {
+-    "access": "public"
+-  },
+   "scripts": {
+     "test": "echo 'No tests yet'"
++  },
++  "dependencies": {
++    "@livestore/common": "workspace:*",
++    "@livestore/utils": "workspace:*"
++  },
++  "devDependencies": {
++    "@cloudflare/workers-types": "^4.20250620.0"
++  },
++  "publishConfig": {
++    "access": "public"
+   }
+ }

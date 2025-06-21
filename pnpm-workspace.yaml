@@ -1,0 +1,5 @@
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+
+patchedDependencies:
+  '@livestore/sync-cf': patches/@livestore__sync-cf.patch

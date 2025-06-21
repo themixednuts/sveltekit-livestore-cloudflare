@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "livestore",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_date": "2025-06-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ADMIN_SECRET": "insecure-token-change-me",
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare",
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "WEBSOCKET_SERVER",
+        "class_name": "WebSocketServer",
+        "script_name": "livestore_websocketserver",
+      },
+    ],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "livestore",
+      "database_id": "some-random-id",
+    },
+  ],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["WebSocketServer"],
+    },
+  ],
+}

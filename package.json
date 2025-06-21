@@ -1,0 +1,39 @@
+{
+  "name": "sveltekit-livestore-cloudflare",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm dlx wrangler dev -c ./wrangler.jsonc -c ./src/lib/cloudflare/workers/wrangler.jsonc --persist-to .wrangler",
+    "build": "vite build",
+    "build:dev": "pnpm run build && pnpm run dev",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-cloudflare": "^7.0.0",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.10",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.0.0",
+    "vite": "^6.2.6",
+    "vite-plugin-devtools-json": "^0.2.0"
+  },
+  "dependencies": {
+    "@livestore/adapter-web": "^0.3.1",
+    "@livestore/devtools-vite": "^0.3.1",
+    "@livestore/livestore": "^0.3.1",
+    "@livestore/peer-deps": "^0.3.1",
+    "@livestore/sync-cf": "^0.3.1",
+    "@livestore/wa-sqlite": "1.0.5-dev.2",
+    "patch-package": "^8.0.0",
+    "wrangler": "^4.20.5"
+  }
+}
